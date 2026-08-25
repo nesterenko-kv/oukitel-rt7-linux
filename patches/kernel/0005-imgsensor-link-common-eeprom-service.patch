@@ -1,0 +1,11 @@
+diff --git a/drivers/misc/mediatek/imgsensor/src/mt6853/Makefile b/drivers/misc/mediatek/imgsensor/src/mt6853/Makefile
+--- a/drivers/misc/mediatek/imgsensor/src/mt6853/Makefile
++++ b/drivers/misc/mediatek/imgsensor/src/mt6853/Makefile
+@@ -35,6 +35,7 @@ obj-y				+= ../common/$(COMMON_VERSION)/seninf.o
+ 
+ #ifdef OPLUS_FEATURE_CAMERA_COMMON
+ obj-y				+= ../OplusImgsensor/imgsensor_eeprom.o
++obj-y				+= ../common/$(COMMON_VERSION)/imgsensor_eeprom_v1.o
+ obj-y				+= ../OplusImgsensor/imgsensor_hwcfg_custom.o
+ 
+ obj-y				+= ../OplusImgsensor/imgsensor_hwcfg_mt6853.o

@@ -1,0 +1,24 @@
+diff --git a/vendor/oplus/kernel_4.19/audio/sia81xx/sia81xx_aux_dev_if.h b/vendor/oplus/kernel_4.19/audio/sia81xx/sia81xx_aux_dev_if.h
+--- a/vendor/oplus/kernel_4.19/audio/sia81xx/sia81xx_aux_dev_if.h
++++ b/vendor/oplus/kernel_4.19/audio/sia81xx/sia81xx_aux_dev_if.h
+@@ -27,9 +27,20 @@ int soc_sia81xx_init(
+ 	struct snd_soc_codec_conf *codec_conf,
+ 	u32 conf_num);
+ 
++#if defined(CONFIG_SIA_PA_ALGO) || defined(CONFIG_SIA_PA_ALGO_MT6833)
+ int soc_aux_init_only_sia81xx(
+ 	struct platform_device *pdev,
+ 	struct snd_soc_card *card);
++#else
++static inline int soc_aux_init_only_sia81xx(
++	struct platform_device *pdev,
++	struct snd_soc_card *card)
++{
++	(void)pdev;
++	(void)card;
++	return 0;
++}
++#endif
+ 
+ #ifdef OPLUS_BUG_COMPATIBILITY
+ #ifdef CONFIG_SIA_PA_ALGO

@@ -29,7 +29,15 @@ device support is moved to Linux incrementally.
 - Audited stock Docker support with Moby's `check-config.sh`
 - Required and recommended Docker kernel configuration fragments
 - Merged configuration passes every generally necessary Moby Docker check
+- Exact official Android clang-r383902 toolchain pinned and verified
+- Reproducible ARM64 Linux 4.19.191 compile baseline built successfully
 - Official same-variant Android 13 recovery reference identified
+- Known public-source omissions tracked explicitly in `docs/source-gaps.md`
+
+The first successful `Image` is 29,151,232 bytes and reproduced the same
+SHA-256 across two consecutive builds. See `docs/kernel-build.md` for hashes,
+validation, and the remaining blockers. It is a research artifact, not a
+flashable release.
 
 ## Repository policy
 
@@ -67,6 +75,8 @@ docker compose run --rm kernel-builder /project/scripts/prepare-kernel-source.sh
 docker compose run --rm kernel-builder /project/scripts/merge-kernel-config.sh
 docker compose run --rm kernel-builder /project/scripts/fetch-moby-check-config.sh
 docker compose run --rm kernel-builder /project/scripts/audit-kernel-config.sh
+docker compose run --rm kernel-builder /project/scripts/prepare-toolchain.sh
+docker compose run --rm kernel-builder /project/scripts/build-kernel.sh
 ```
 
 Set `RT7_WORK_DIR` when the private sibling work directory is stored somewhere

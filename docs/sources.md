@@ -31,6 +31,19 @@ module tree. That companion source is pinned at commit
 
 The builder keeps both repositories in Linux-native Docker volumes and
 recreates the links normally supplied by a full Android source checkout.
+That layout includes both `/work/kernel/drivers/kernel-4.19 -> /work/kernel`
+and `/work/modules/vendor/kernel-4.19 -> /work/kernel`. The first reproduces
+the include's lexical Android checkout path; the second is needed after clang
+resolves the charger header symlink into the companion module tree. Both links
+exist only in the Linux source volumes.
+
+## Compiler toolchain
+
+Both the public `build.config.mtk.aarch64` and the official V1.4.8 kernel build
+string identify Android clang 11.0.1 based on `clang-r383902`. The builder uses
+the `clang-r383902` directory from AOSP's `android-11.0.0_r1` prebuilt tag. The
+archive hash, repository commit, and directory tree object are pinned in
+`sources.lock`.
 
 ## Stock kernel configuration
 

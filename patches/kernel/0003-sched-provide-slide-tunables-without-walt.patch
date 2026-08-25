@@ -1,0 +1,19 @@
+diff --git a/kernel/sched/tune.c b/kernel/sched/tune.c
+--- a/kernel/sched/tune.c
++++ b/kernel/sched/tune.c
+@@ -15,6 +15,15 @@
+ bool schedtune_initialized = false;
+ extern struct reciprocal_value schedtune_spc_rdiv;
+ 
++/*
++ * sched_assist_slide_v1.c normally owns these tunables, but that object is
++ * only built with WALT. The RT7 stock configuration deliberately omits WALT.
++ */
++#ifndef CONFIG_SCHED_WALT
++int sysctl_slide_boost_enabled;
++int sysctl_boost_task_threshold = 51;
++#endif
++
+ /* We hold schedtune boost in effect for at least this long */
+ #define SCHEDTUNE_BOOST_HOLD_NS 50000000ULL
+ 

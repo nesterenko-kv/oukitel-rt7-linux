@@ -21,6 +21,16 @@ commit = "2fea1c603bf5bfbc1f480383dcf10abe87cbeaf0"
 sha256 = "fda4343e9b50c47896653ca774ccbe9614bfcdb60f080d2b6277baf27efc0a71"
 purpose = "Audit kernel feature support required by Docker Engine"
 
+[[toolchain]]
+name = "android-clang-r383902"
+url = "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/tags/android-11.0.0_r1/clang-r383902.tar.gz"
+ref = "refs/tags/android-11.0.0_r1"
+commit = "4d3731f193390a521b189113ee03ce725e043379"
+tree = "34feae7abc38fffe258af1842a4c19746368cec6"
+size = 342332098
+sha256 = "b405185894767ab9eaa23febc7ad549aa970ad3997ff7182f46d545e19c26a86"
+purpose = "Exact clang family recorded in the official RT7 kernel build"
+
 [[firmware]]
 name = "official-android-13-reference"
 catalog_url = "https://oukitel.com/pages/download-center"

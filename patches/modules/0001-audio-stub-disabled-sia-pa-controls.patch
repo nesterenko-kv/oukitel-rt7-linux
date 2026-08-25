@@ -1,0 +1,13 @@
+diff --git a/vendor/oplus/kernel_4.19/audio/sia81xx/sia81xx_aux_dev_if.h b/vendor/oplus/kernel_4.19/audio/sia81xx/sia81xx_aux_dev_if.h
+--- a/vendor/oplus/kernel_4.19/audio/sia81xx/sia81xx_aux_dev_if.h
++++ b/vendor/oplus/kernel_4.19/audio/sia81xx/sia81xx_aux_dev_if.h
+@@ -36,6 +36,9 @@ int soc_aux_init_only_sia81xx(
+ #ifdef CONFIG_SIA_PA_ALGO
+ extern void sia81xx_start(void);
+ extern void sia81xx_stop(void);
++#else
++static inline void sia81xx_start(void) { }
++static inline void sia81xx_stop(void) { }
+ #endif /*CONFIG_SIA_PA_ALGO*/
+ #endif /* OPLUS_BUG_COMPATIBILITY */
+ 

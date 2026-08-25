@@ -3,6 +3,9 @@
 *.bat text eol=crlf
 *.cmd text eol=crlf
 
+# Unified-diff context lines intentionally contain a leading marker space.
+*.patch text eol=lf -whitespace
+
 *.7z binary
 *.bin binary
 *.dtb binary

@@ -1,0 +1,20 @@
+diff --git a/drivers/misc/mediatek/pmic/mt6360/v1/pmu/mt6360_pmu_rgbled.c b/drivers/misc/mediatek/pmic/mt6360/v1/pmu/mt6360_pmu_rgbled.c
+--- a/drivers/misc/mediatek/pmic/mt6360/v1/pmu/mt6360_pmu_rgbled.c
++++ b/drivers/misc/mediatek/pmic/mt6360/v1/pmu/mt6360_pmu_rgbled.c
+@@ -49,6 +49,16 @@ struct mt6360_pmu_rgbled_info {
+ 	unsigned long long old_time;
+ };
++#ifdef CONFIG_OPLUS_MISC_HEALTHONFO
+ extern int oplus_misc_healthinfo(int type, int para, int bright);
++#else
++static inline int oplus_misc_healthinfo(int type, int para, int bright)
++{
++	(void)type;
++	(void)para;
++	(void)bright;
++	return 0;
++}
++#endif
+ 
+ static const struct mt6360_rgbled_platform_data def_platform_data = {
+ };

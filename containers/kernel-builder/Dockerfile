@@ -13,6 +13,7 @@ RUN apt-get update \
         device-tree-compiler \
         file \
         flex \
+        gcc-aarch64-linux-gnu \
         git \
         kmod \
         libelf-dev \

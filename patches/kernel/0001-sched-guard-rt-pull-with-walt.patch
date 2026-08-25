@@ -1,0 +1,12 @@
+diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+--- a/kernel/sched/fair.c
++++ b/kernel/sched/fair.c
+@@ -11568,7 +11568,7 @@ static inline void nohz_newidle_balance(struct rq *this_rq) { }
+  * idle_balance is called by schedule() if this_cpu is about to become
+  * idle. Attempts to pull tasks from other CPUs.
+  */
+-#ifdef OPLUS_FEATURE_SCHED_ASSIST
++#if defined(OPLUS_FEATURE_SCHED_ASSIST) && defined(CONFIG_SCHED_WALT)
+ #define WALT_RT_PULL_THRESHOLD_NS 80000
+ bool is_same_cluster(int src_cpu, int this_cpu)
+ {

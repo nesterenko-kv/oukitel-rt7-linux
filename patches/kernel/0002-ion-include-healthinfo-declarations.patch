@@ -1,0 +1,12 @@
+diff --git a/drivers/staging/android/mtk_ion/ion.c b/drivers/staging/android/mtk_ion/ion.c
+--- a/drivers/staging/android/mtk_ion/ion.c
++++ b/drivers/staging/android/mtk_ion/ion.c
+@@ -54,7 +54,7 @@
+ #include <linux/healthinfo/memory_monitor.h>
+ #endif /*OPLUS_FEATURE_HEALTHINFO*/
+ 
+-#if defined(OPLUS_FEATURE_HEALTHINFO) && defined(CONFIG_OPLUS_HEALTHINFO)
++#ifdef OPLUS_FEATURE_HEALTHINFO
+ #include <linux/healthinfo/ion.h>
+ #endif
+ #ifdef CONFIG_MTK_IOMMU_V2

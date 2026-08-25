@@ -13,6 +13,8 @@ services:
     volumes:
       - kernel-source:/work/kernel
       - kernel-modules-source:/work/modules
+      - clang-toolchain:/work/toolchain
+      - kernel-build:/work/build
       - type: bind
         source: .
         target: /project
@@ -24,3 +26,5 @@ services:
 volumes:
   kernel-source:
   kernel-modules-source:
+  clang-toolchain:
+  kernel-build:
