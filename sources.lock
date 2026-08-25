@@ -1,0 +1,42 @@
+format = 1
+
+[[git]]
+name = "oppo-mtk-kernel-4.19"
+url = "https://github.com/oppo-source/android_kernel_oppo_mtk_4.19.git"
+ref = "refs/heads/oppo/mtk_t_13.0.0"
+commit = "f1ac3e53f433c6b68e2f6f37191e488d2bd41557"
+purpose = "Initial MT6853-compatible Linux 4.19.191 source base"
+
+[[git]]
+name = "oppo-mtk-kernel-modules-4.19"
+url = "https://github.com/oppo-source/android_kernel_modules_oppo_mtk_4.19.git"
+ref = "refs/heads/oppo/mtk_t_13.0.0"
+commit = "aa8b40a3f646040b2c58b695373407731718daed"
+purpose = "External OPLUS/MediaTek sources referenced by the kernel tree"
+
+[[tool]]
+name = "moby-check-config"
+url = "https://raw.githubusercontent.com/moby/moby/2fea1c603bf5bfbc1f480383dcf10abe87cbeaf0/contrib/check-config.sh"
+commit = "2fea1c603bf5bfbc1f480383dcf10abe87cbeaf0"
+sha256 = "fda4343e9b50c47896653ca774ccbe9614bfcdb60f080d2b6277baf27efc0a71"
+purpose = "Audit kernel feature support required by Docker Engine"
+
+[[firmware]]
+name = "official-android-13-reference"
+catalog_url = "https://oukitel.com/pages/download-center"
+drive_folder_id = "1VtYQelAQStPexSykWkVSRKdJDMZ2AaBX"
+file_id = "1_nsltiSiIPhGimfhKSUIzkfVT7Xu36IJ"
+filename = "TP758_OQ_P07_NFC_6853_T0_EEA_V1.4.8_S251017.zip"
+size = 2585630382
+sha256 = "a54838940bd9d92fbce9aa2fd155f00d9973baecf60f9f273b769f8d28dbcd62"
+redistributable = false
+purpose = "Recovery reference for the same TP758/P07 NFC/MT6853 Android 13 variant"
+
+[captured]
+stock_kernel_release = "4.19.191"
+stock_kernel_config_sha256 = "f88570fb45bb35f01aadf088393cff341ef3d00a67995f162f38d1e11f28df2d"
+installed_build = "OUKITEL_P07_NFC_EEA_V04_20231205"
+expected_installed_firmware = "TP758_OQ_P07_NFC_6853_T0_EEA_V1.2.9_S231205.zip"
+official_v148_boot_sha256 = "6dab05265bb57a68ceb244e12ea1b5fa69e660b5fb3bfc9b774c74e83a10b998"
+official_v148_dtbo_sha256 = "43f197fc78d8d5f5cd5894a374e32ab4807bcdf6d1a1b385a20a3fee7f829ede"
+official_v148_kernel_config_sha256 = "7a23f3bbb84466e681e1bbb4552c2e57329a7173ff43cd8d0bcb823bd82c3a38"

@@ -1,0 +1,26 @@
+name: oukitel-rt7-linux
+
+services:
+  kernel-builder:
+    build:
+      context: ./containers/kernel-builder
+    image: local/oukitel-rt7-kernel-builder:ubuntu-24.04
+    entrypoint: ["/bin/sh", "/project/scripts/kernel-builder-entrypoint.sh"]
+    # Named volumes start root-owned on Docker Desktop. The builder is isolated
+    # and needs to create the initial Linux checkout in that volume.
+    user: "0:0"
+    working_dir: /work
+    volumes:
+      - kernel-source:/work/kernel
+      - kernel-modules-source:/work/modules
+      - type: bind
+        source: .
+        target: /project
+        read_only: true
+      - type: bind
+        source: ${RT7_WORK_DIR:-../oukitel-rt7-linux-work}
+        target: /rt7-work
+
+volumes:
+  kernel-source:
+  kernel-modules-source:

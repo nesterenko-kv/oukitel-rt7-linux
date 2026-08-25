@@ -21,6 +21,16 @@ device support is moved to Linux incrementally.
 - Stock kernel: Linux 4.19.191
 - Partition layout: A/B with dynamic partitions and AVB
 
+## Progress
+
+- Read-only, privacy-conscious device inventory collector
+- Pinned Linux 4.19.191 MT6853-compatible kernel and external module sources
+- Captured and hashed stock kernel configuration
+- Audited stock Docker support with Moby's `check-config.sh`
+- Required and recommended Docker kernel configuration fragments
+- Merged configuration passes every generally necessary Moby Docker check
+- Official same-variant Android 13 recovery reference identified
+
 ## Repository policy
 
 This public repository contains only redistributable material:
@@ -38,10 +48,29 @@ artifacts.
 ## Layout
 
 - `configs/` - kernel and system configuration fragments
+- `containers/` - pinned local build environments
 - `docs/` - device, build, recovery, and porting documentation
 - `patches/` - reviewable patches against upstream source trees
 - `rootfs/` - reproducible Debian root filesystem definitions
 - `scripts/` - host-side build, inspection, and packaging tools
+
+## Windows build environment
+
+The kernel cannot be checked out directly on NTFS because the upstream tree
+contains filenames reserved by Windows. It also references an external OPPO
+module tree through symbolic links. Use the two Docker named volumes defined in
+`compose.yaml`:
+
+```sh
+docker compose build kernel-builder
+docker compose run --rm kernel-builder /project/scripts/prepare-kernel-source.sh
+docker compose run --rm kernel-builder /project/scripts/merge-kernel-config.sh
+docker compose run --rm kernel-builder /project/scripts/fetch-moby-check-config.sh
+docker compose run --rm kernel-builder /project/scripts/audit-kernel-config.sh
+```
+
+Set `RT7_WORK_DIR` when the private sibling work directory is stored somewhere
+other than `../oukitel-rt7-linux-work`.
 
 ## Safety rules
 
