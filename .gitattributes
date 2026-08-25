@@ -1,0 +1,12 @@
+* text=auto eol=lf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+*.7z binary
+*.bin binary
+*.dtb binary
+*.dtbo binary
+*.img binary
+*.png binary
+*.zip binary
