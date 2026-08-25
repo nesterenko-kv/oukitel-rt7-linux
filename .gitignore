@@ -1,0 +1,36 @@
+# Local work and build output
+/build/
+/downloads/
+/out/
+/toolchains/
+/work/
+
+# Firmware and generated images
+*.bin
+*.dtb
+*.dtbo
+*.img
+*.mbn
+*.pac
+*.raw
+*.rom
+*.tar
+*.tar.*
+*.zip
+*.7z
+
+# Device dumps, credentials, and local configuration
+*.dump
+*.key
+*.pem
+.env
+.env.*
+adbkey
+adbkey.pub
+
+# Editor and OS metadata
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
