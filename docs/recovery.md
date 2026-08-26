@@ -142,3 +142,20 @@ Successful completion produces `pass1/`, `pass2/`, `SHA256SUMS.txt`, and a
 parsed `capture-manifest.json` under the private output directory. Save the
 whole verified directory to a second offline medium before any bootloader
 unlock or boot experiment.
+
+Use `copy-verified-recovery.ps1` to enforce that boundary. It validates every
+artifact listed in `SHA256SUMS.txt`, refuses a destination on the same physical
+disk, performs a dry run by default, refuses to overwrite either the final or
+staging path, and verifies every copied file before the staging directory is
+renamed into place:
+
+```powershell
+./scripts/copy-verified-recovery.ps1 `
+  -SourceDirectory C:\path\to\rt7-installed-v04-20231205 `
+  -DestinationRoot D:\RT7-Recovery
+
+./scripts/copy-verified-recovery.ps1 `
+  -SourceDirectory C:\path\to\rt7-installed-v04-20231205 `
+  -DestinationRoot D:\RT7-Recovery `
+  -Execute
+```

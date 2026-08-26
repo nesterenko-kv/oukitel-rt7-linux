@@ -62,6 +62,7 @@ docker compose run --rm --entrypoint /opt/venv/bin/python recovery-reader \
     /project/tests/smoke_mtkclient_usb_filter.py
 pwsh -File tests/inspect-rt7-fastboot.Tests.ps1
 pwsh -File tests/wait-bind-rt7-brom.Tests.ps1
+pwsh -File tests/copy-verified-recovery.Tests.ps1
 ```
 
 `attach-rt7-usb.ps1` validates that a selected usbipd-win BUSID belongs to an
@@ -76,6 +77,12 @@ binding is intentionally avoided because usbipd-win 5.3 may persist it without
 the requested forced flag. Elevation is checked only when a binding must be
 created or replaced; an already forced identity can be attached from a normal
 PowerShell process.
+
+`copy-verified-recovery.ps1` verifies the completed capture manifest and all
+listed SHA-256 hashes, requires a different physical source/destination disk,
+copies into a non-overwriting staging path, and verifies every copied file
+before publishing the second recovery copy. It is a dry run unless `-Execute`
+is provided.
 
 `build-rootfs.ps1` builds the pinned Debian ARM64 image, runs the privileged
 ext4/OverlayFS SSH and Docker smoke test, and exports the rootfs tar into the
