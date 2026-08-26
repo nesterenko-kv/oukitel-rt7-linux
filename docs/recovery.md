@@ -79,13 +79,18 @@ transports without racing Device Manager, start this helper from an elevated
 PowerShell before connecting the powered-off tablet:
 
 ```powershell
-./scripts/wait-bind-rt7-brom.ps1 -Execute
+./scripts/wait-bind-rt7-brom.ps1 -Execute -Force
 ```
 
 It accepts exactly one connected `0e8d:2000` or `0e8d:0003` device, binds only
 its resolved BUSID, attaches it to Docker Desktop, follows a preloader-to-BROM
 reconnect, and exits after BootROM is attached. It never opens the device or
 sends it a USB command itself.
+
+`-Force` is explicit because it temporarily prevents Windows from claiming the
+two short-lived serial interfaces. This is needed when the host COM driver wins
+the sub-second race; it affects only the host binding and is reversible with
+`usbipd unbind --hardware-id 0e8d:2000` and the equivalent `0e8d:0003` command.
 
 The helper refuses a BUSID unless Windows reports a MediaTek/RT7 USB device. If
 the device has not been shared previously, it prints the one elevated `bind`

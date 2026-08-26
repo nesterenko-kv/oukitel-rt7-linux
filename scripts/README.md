@@ -67,7 +67,9 @@ pwsh -File tests/inspect-rt7-fastboot.Tests.ps1
 RT7/MediaTek device. It is a dry run unless `-Execute` is provided.
 `wait-bind-rt7-brom.ps1` polls for the short-lived MediaTek preloader/BROM
 identities (`0e8d:2000` and `0e8d:0003`) and, only when run elevated with
-`-Execute`, shares and attaches those exact BUSIDs.
+`-Execute`, shares and attaches those exact BUSIDs. Its explicit `-Force` mode
+prevents the Windows COM driver from winning the short preloader handoff and is
+reversible with `usbipd unbind`.
 
 `build-rootfs.ps1` builds the pinned Debian ARM64 image, runs the privileged
 ext4/OverlayFS SSH and Docker smoke test, and exports the rootfs tar into the
