@@ -3,8 +3,8 @@ param(
     [ValidateRange(5, 600)]
     [int]$TimeoutSeconds = 180,
 
-    [ValidateRange(50, 2000)]
-    [int]$PollMilliseconds = 100,
+    [ValidateRange(10, 2000)]
+    [int]$PollMilliseconds = 25,
 
     [switch]$Execute,
 

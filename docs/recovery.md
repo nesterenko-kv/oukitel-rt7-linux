@@ -93,6 +93,12 @@ The helper deliberately resolves the connected USB identity first and invokes
 persisting `IsForced=false`, which lets the Windows serial driver win the next
 sub-second preloader handoff.
 
+The default 25 ms polling interval is intentional: the RT7's `0e8d:0003`
+BootROM identity can disappear into the next boot mode before usbipd-win's
+multi-second `--auto-attach` retry observes it. Keep the helper running until it
+reports that BootROM has been attached; do not run a second auto-attach loop for
+the same BUSID in parallel.
+
 `-Force` is explicit because it temporarily prevents Windows from claiming the
 two short-lived serial interfaces. This is needed when the host COM driver wins
 the sub-second race; it affects only the host binding and is reversible with
