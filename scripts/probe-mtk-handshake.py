@@ -9,12 +9,14 @@ four-byte synchronization exchange used before any MediaTek command.
 from __future__ import annotations
 
 import argparse
+from ctypes import c_int, c_void_p
 import sys
 import time
 from dataclasses import dataclass
 from typing import Iterable
 
 import usb.core
+import usb.backend.libusb1
 import usb.util
 
 
@@ -47,15 +49,33 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def matching_devices() -> Iterable[object]:
-    devices = usb.core.find(find_all=True, idVendor=VID_MEDIATEK)
+def load_backend() -> object:
+    backend = usb.backend.libusb1.get_backend()
+    if backend is None:
+        raise RuntimeError("libusb-1.0 backend is unavailable")
+    if sys.platform == "win32":
+        try:
+            backend.lib.libusb_set_option.argtypes = [c_void_p, c_int]
+            result = backend.lib.libusb_set_option(backend.ctx, 1)
+        except (AttributeError, OSError) as error:
+            raise RuntimeError(f"cannot enable the UsbDk backend: {error}") from error
+        if result != 0:
+            raise RuntimeError(f"enabling the UsbDk backend returned {result}")
+        print("backend=libusb-1.0/usbdk", flush=True)
+    else:
+        print("backend=libusb-1.0", flush=True)
+    return backend
+
+
+def matching_devices(backend: object) -> Iterable[object]:
+    devices = usb.core.find(find_all=True, idVendor=VID_MEDIATEK, backend=backend)
     return (device for device in devices if device.idProduct in TRANSPORT_PIDS)
 
 
-def wait_for_transport(timeout: float, poll_interval: float) -> object:
+def wait_for_transport(backend: object, timeout: float, poll_interval: float) -> object:
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
-        for device in matching_devices():
+        for device in matching_devices(backend):
             return device
         time.sleep(poll_interval)
     raise TimeoutError(f"no MediaTek transport appeared within {timeout:g} seconds")
@@ -166,7 +186,8 @@ def main() -> int:
         flush=True,
     )
     try:
-        device = wait_for_transport(args.timeout, args.poll_interval)
+        backend = load_backend()
+        device = wait_for_transport(backend, args.timeout, args.poll_interval)
         print(
             f"detected vid=0x{device.idVendor:04x} pid=0x{device.idProduct:04x} "
             f"device_class=0x{device.bDeviceClass:02x} "
