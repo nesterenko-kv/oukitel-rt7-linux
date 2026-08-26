@@ -3,6 +3,10 @@
 No custom image should be booted until the exact installed boot chain has been
 captured from the tablet and validated. The official V1.4.8 archive is a useful
 reference, but the tablet currently runs the older December 2023 build.
+During the 2026-08-26 audit, OUKITEL's current public
+[RT7 TITAN 5G/A13 folder](https://drive.google.com/drive/folders/1VtYQelAQStPexSykWkVSRKdJDMZ2AaBX)
+listed only V1.4.8, not the installed V1.2.9/S231205 archive. Community mirrors
+are not accepted as the sole rollback source.
 
 ## Recovery transport
 
@@ -25,7 +29,7 @@ The first device connection must remain read-only.
 
 `scripts/capture-recovery-baseline.py` has a fixed command plan. It reads:
 
-- primary and backup GPT;
+- complete primary and backup GPT spans, including both partition-entry arrays;
 - `boot`, `dtbo`, `lk`, `tee`, and all three `vbmeta` partitions for slots A
   and B;
 - `misc`, `para`, and `seccfg` for A/B and lock-state recovery;
@@ -33,7 +37,16 @@ The first device connection must remain read-only.
 
 It deliberately excludes `userdata`, `metadata`, `nvram`, `nvdata`, `persist`,
 `protect1`, and `protect2`. All results stay under the private sibling work
-directory and are hashed after exact-size validation.
+directory. Every artifact is read twice during the same DA session; the two
+copies must be byte-identical.
+
+Pinned mtkclient v2.1.4 normally writes a truncated primary GPT and labels a
+slice of that data as `gpt_backup.bin`. The recovery-reader image applies the
+reviewable `containers/mtkclient/mtkclient-gpt-capture.patch`, which reads both
+complete GPT spans from the LBAs declared by the primary header. The validator
+then checks both header CRCs, both partition-array CRCs, mirrored LBA pointers,
+identical primary/backup entries, partition sizes, boot-image magic, and the
+two independent read passes.
 
 ## Host preparation and dry run
 
@@ -69,5 +82,11 @@ Entering BROM usually requires a powered-off device and a volume-key chord
 while connecting USB. Do not use any `mtkclient` write, erase, unlock, or
 `seccfg` modification command during this milestone.
 
-Successful completion produces `SHA256SUMS.txt` beside the private dumps. Save
-a second offline copy before any bootloader unlock or boot experiment.
+The DA and exploit path executes volatile code in tablet RAM and may reset the
+device; "read-only" here specifically means that the fixed command allowlist
+contains no persistent-storage write, erase, unlock, or patch operation.
+
+Successful completion produces `pass1/`, `pass2/`, `SHA256SUMS.txt`, and a
+parsed `capture-manifest.json` under the private output directory. Save the
+whole verified directory to a second offline medium before any bootloader
+unlock or boot experiment.

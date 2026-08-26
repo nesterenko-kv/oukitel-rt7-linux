@@ -1,0 +1,79 @@
+diff --git a/mtkclient/Library/DA/mtk_da_handler.py b/mtkclient/Library/DA/mtk_da_handler.py
+--- a/mtkclient/Library/DA/mtk_da_handler.py
++++ b/mtkclient/Library/DA/mtk_da_handler.py
+@@ -260,26 +260,60 @@ class DaHandler(metaclass=LogBase):
+                     if display:
+                         self.error("Error on patching vbmeta :(")
+ 
+     def da_gpt(self, directory: str, display: bool = True):
++        # RT7_CAPTURE_GPT_V1: v2.1.4 writes a truncated primary GPT and labels
++        # a primary-GPT slice as gpt_backup.bin. Read both complete GPT spans
++        # directly from storage using the LBAs in the validated primary header.
+         if directory is None:
+             directory = ""
+ 
+-        sfilename = os.path.join(directory, "gpt.bin")
+-        data, guid_gpt = self.mtk.daloader.get_gpt()
++        _, guid_gpt = self.mtk.daloader.get_gpt()
+         if guid_gpt is None:
+-            self.error("Error reading gpt")
+-            self.close()
+-        else:
+-            with open(sfilename, "wb") as wf:
+-                wf.write(data)
+-
+-            if display:
+-                print(f"Dumped GPT from to {sfilename}")
+-            sfilename = os.path.join(directory, "gpt_backup.bin")
+-            with open(sfilename, "wb") as wf:
+-                wf.write(data[self.mtk.daloader.daconfig.pagesize:])
+-            if display:
+-                print(f"Dumped Backup GPT to {sfilename}")
++            raise RuntimeError("Error reading GPT")
++
++        header = guid_gpt.header
++        sector_size = guid_gpt.sectorsize
++        if header.signature != b"EFI PART" or sector_size not in (0x200, 0x1000):
++            raise RuntimeError("Invalid primary GPT header")
++
++        primary_sectors = header.first_usable_lba
++        backup_sectors = primary_sectors - 1
++        backup_start_lba = header.backup_lba - backup_sectors + 1
++        flash_size = self.mtk.daloader.daconfig.storage.flashsize
++        if (primary_sectors < 3 or backup_sectors < 2 or
++                backup_start_lba <= header.last_usable_lba or
++                (header.backup_lba + 1) * sector_size > flash_size):
++            raise RuntimeError("Unsafe GPT geometry")
++
++        def read_exact(address, length, label):
++            result = self.mtk.daloader.readflash(
++                addr=address,
++                length=length,
++                filename="",
++                parttype="user",
++                display=False,
++            )
++            if not isinstance(result, (bytes, bytearray)) or len(result) != length:
++                raise RuntimeError(f"Short read while capturing {label}")
++            return result
++
++        primary = read_exact(0, primary_sectors * sector_size, "primary GPT")
++        backup = read_exact(
++            backup_start_lba * sector_size,
++            backup_sectors * sector_size,
++            "backup GPT",
++        )
++
++        primary_filename = os.path.join(directory, "gpt.bin")
++        with open(primary_filename, "wb") as wf:
++            wf.write(primary)
++        backup_filename = os.path.join(directory, "gpt_backup.bin")
++        with open(backup_filename, "wb") as wf:
++            wf.write(backup)
++
++        if display:
++            print(f"Dumped complete primary GPT to {primary_filename}")
++            print(f"Dumped complete backup GPT to {backup_filename}")
+ 
+     def da_read_partition(self, partitionname, parttype="user", display: bool = True):
+         rpartition = None

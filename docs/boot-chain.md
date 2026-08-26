@@ -33,6 +33,13 @@ The reference `boot.img` has:
 - kernel build `4.19.191`, compiled with Android clang 11.0.1 based on
   `clang-r383902`.
 
+Strings in the same official V1.4.8 `lk.img` include the MediaTek fastboot
+command handler `cmd_boot`, the `boot` command, download-buffer handling, and
+the standard `flashing get_unlock_ability` / `flashing unlock` flow. This is
+strong evidence that a nonpersistent `fastboot boot` experiment exists in the
+reference LK. The exact installed December 2023 `lk_a` still has to be dumped
+and checked before relying on that path.
+
 The extracted V1.4.8 kernel configuration has the same 5,870 symbols as the
 running stock configuration. Only two symbol values differ: the newer image
 adds two camera sensors and enables `CONFIG_ODM_BATTERY_ID_ADC`. This is strong

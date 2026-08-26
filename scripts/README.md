@@ -33,7 +33,16 @@ script refuses to write build artifacts into the public repository.
 `capture-recovery-baseline.py` runs only in the `recovery-reader` container. It
 prints a fixed read-only plan by default and needs `--execute` before it opens a
 USB device. It cannot select arbitrary partitions or accept arbitrary
-mtkclient commands; see `docs/recovery.md`.
+mtkclient commands. It verifies complete primary/backup GPT structures and two
+independent reads of every allowlisted artifact; see `docs/recovery.md`.
+
+Its offline safety tests are:
+
+```sh
+python -m unittest discover -s tests -v
+docker compose run --rm --entrypoint /opt/venv/bin/python recovery-reader \
+    /project/tests/smoke_mtkclient_gpt_patch.py
+```
 
 `attach-rt7-usb.ps1` validates that a selected usbipd-win BUSID belongs to an
 RT7/MediaTek device. It is a dry run unless `-Execute` is provided.

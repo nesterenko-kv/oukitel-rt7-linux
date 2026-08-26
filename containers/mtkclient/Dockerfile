@@ -19,6 +19,16 @@ RUN git init /opt/mtkclient \
     && git -C /opt/mtkclient checkout --detach FETCH_HEAD \
     && test "$(git -C /opt/mtkclient rev-parse HEAD)" = "${MTKCLIENT_COMMIT}"
 
+COPY mtkclient-gpt-capture.patch /tmp/mtkclient-gpt-capture.patch
+
+RUN git -C /opt/mtkclient apply --check /tmp/mtkclient-gpt-capture.patch \
+    && git -C /opt/mtkclient apply /tmp/mtkclient-gpt-capture.patch \
+    && git -C /opt/mtkclient diff --check \
+    && grep -q RT7_CAPTURE_GPT_V1 \
+        /opt/mtkclient/mtkclient/Library/DA/mtk_da_handler.py \
+    && python3 -m py_compile \
+        /opt/mtkclient/mtkclient/Library/DA/mtk_da_handler.py
+
 COPY requirements.txt /tmp/mtkclient-requirements.txt
 
 WORKDIR /opt/mtkclient
