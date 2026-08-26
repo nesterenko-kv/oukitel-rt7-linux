@@ -86,6 +86,11 @@ The DA and exploit path executes volatile code in tablet RAM and may reset the
 device; "read-only" here specifically means that the fixed command allowlist
 contains no persistent-storage write, erase, unlock, or patch operation.
 
+The wrapper also fixes the USB transport to the real MediaTek BootROM identity
+`0e8d:0003`. The RT7 can expose an Android META composite interface as
+`0e8d:200e`; that interface contains ADB and CDC endpoints and is deliberately
+rejected instead of being mistaken for a preloader.
+
 Successful completion produces `pass1/`, `pass2/`, `SHA256SUMS.txt`, and a
 parsed `capture-manifest.json` under the private output directory. Save the
 whole verified directory to a second offline medium before any bootloader
