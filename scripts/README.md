@@ -37,3 +37,7 @@ mtkclient commands; see `docs/recovery.md`.
 
 `attach-rt7-usb.ps1` validates that a selected usbipd-win BUSID belongs to an
 RT7/MediaTek device. It is a dry run unless `-Execute` is provided.
+
+`build-rootfs.ps1` builds the pinned Debian ARM64 image, runs the privileged
+ext4/OverlayFS SSH and Docker smoke test, and exports the rootfs tar into the
+private work directory. It refuses to overwrite an existing artifact.

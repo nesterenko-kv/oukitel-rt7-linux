@@ -31,6 +31,15 @@ size = 342332098
 sha256 = "b405185894767ab9eaa23febc7ad549aa970ad3997ff7182f46d545e19c26a86"
 purpose = "Exact clang family recorded in the official RT7 kernel build"
 
+[[container]]
+name = "debian-bookworm-slim-arm64"
+url = "docker.io/library/debian"
+ref = "bookworm-slim"
+platform = "linux/arm64/v8"
+manifest = "sha256:6bd27d44e6c32a66bbd72d7cb2b76a8ae3497ec2e5274a81abd1b37f6013fa1f"
+snapshot = "20260824T000000Z"
+purpose = "Pinned Debian ARM64 base for SSH and native Docker userspace"
+
 [[git]]
 name = "aosp-mkbootimg"
 url = "https://android.googlesource.com/platform/system/tools/mkbootimg"

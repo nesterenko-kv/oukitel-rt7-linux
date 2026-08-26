@@ -1,0 +1,36 @@
+#!/bin/sh
+set -eu
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "rt7-chroot-start must run as root" >&2
+    exit 1
+fi
+
+for mountpoint in /proc /sys /dev; do
+    if ! mountpoint -q "${mountpoint}"; then
+        echo "required mount is missing inside chroot: ${mountpoint}" >&2
+        exit 1
+    fi
+done
+
+install -d -m 0755 /run/sshd /run/docker /var/log/rt7
+ssh-keygen -A
+sshd -t
+
+if [ ! -s /home/rt7/.ssh/authorized_keys ]; then
+    echo "refusing to start sshd without /home/rt7/.ssh/authorized_keys" >&2
+    exit 1
+fi
+
+if [ ! -s /run/sshd.pid ] || ! kill -0 "$(cat /run/sshd.pid)" 2>/dev/null; then
+    /usr/sbin/sshd
+fi
+
+if [ ! -s /run/docker.pid ] || ! kill -0 "$(cat /run/docker.pid)" 2>/dev/null; then
+    nohup /usr/sbin/dockerd \
+        --config-file=/etc/docker/daemon.json \
+        --pidfile=/run/docker.pid \
+        > /var/log/rt7/dockerd.log 2>&1 &
+fi
+
+echo "Debian SSH and Docker startup requested"

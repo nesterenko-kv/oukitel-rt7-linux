@@ -49,6 +49,20 @@ services:
         source: ${RT7_WORK_DIR:-../oukitel-rt7-linux-work}
         target: /rt7-work
 
+  rootfs-packager:
+    build:
+      context: ./containers/rootfs-packager
+    image: local/oukitel-rt7-rootfs-packager:ubuntu-24.04
+    network_mode: none
+    volumes:
+      - type: bind
+        source: .
+        target: /project
+        read_only: true
+      - type: bind
+        source: ${RT7_WORK_DIR:-../oukitel-rt7-linux-work}
+        target: /rt7-work
+
 volumes:
   kernel-source:
   kernel-modules-source:

@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+echo "architecture=$(dpkg --print-architecture)"
+echo "kernel=$(uname -r)"
+/usr/sbin/sshd -t
+/usr/bin/docker version --format 'docker-client={{.Client.Version}}'
+/usr/bin/docker info --format 'docker-server={{.ServerVersion}} storage={{.Driver}}'

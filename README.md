@@ -35,12 +35,19 @@ device support is moved to Linux incrementally.
 - Kernel-only unsigned boot-image substitution validated offline
 - Official same-variant Android 13 recovery reference identified
 - Pinned MT6853 read-only recovery container and fixed capture plan
+- Reproducible Debian 12 ARM64 rootfs with key-only SSH and native Docker
+- Docker daemon and SSH startup validated in an ARM64 ext4 smoke test
 - Known public-source omissions tracked explicitly in `docs/source-gaps.md`
 
 The first successful `Image` is 29,151,232 bytes and reproduced the same
 SHA-256 across two consecutive builds. See `docs/kernel-build.md` for hashes,
 validation, and the remaining blockers. It is a research artifact, not a
 flashable release.
+
+The keyless Debian rootfs tar also reproduced byte-for-byte across two builds:
+`8b6c5aea5d623f03eda1d45ccf14c3ccbe2a5e609afb5cb9ce9b1e9c76845483`.
+An SSH key is injected only while creating the private ext4 image; see
+`rootfs/README.md` for the build and validation procedure.
 
 ## Repository policy
 
