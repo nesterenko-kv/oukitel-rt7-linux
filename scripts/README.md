@@ -61,6 +61,7 @@ docker compose run --rm --entrypoint /opt/venv/bin/python recovery-reader \
 docker compose run --rm --entrypoint /opt/venv/bin/python recovery-reader \
     /project/tests/smoke_mtkclient_usb_filter.py
 pwsh -File tests/inspect-rt7-fastboot.Tests.ps1
+pwsh -File tests/wait-bind-rt7-brom.Tests.ps1
 ```
 
 `attach-rt7-usb.ps1` validates that a selected usbipd-win BUSID belongs to an

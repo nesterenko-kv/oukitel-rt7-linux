@@ -36,10 +36,10 @@ if ($Force -and -not $Execute) {
 
 if ($Execute -and $Force) {
     $initialState = (& $usbipd.Source state | ConvertFrom-Json)
-    foreach ($pid in $targetPids) {
-        $hardwareId = "0e8d:$pid"
+    foreach ($targetPid in $targetPids) {
+        $hardwareId = "0e8d:$targetPid"
         $pattern = [regex]::new(
-            "^USB\\VID_0E8D&PID_${pid}\\",
+            "^USB\\VID_0E8D&PID_${targetPid}\\",
             [Text.RegularExpressions.RegexOptions]::IgnoreCase
         )
         $nonForced = @($initialState.Devices | Where-Object {
@@ -72,10 +72,10 @@ while ([DateTime]::UtcNow -lt $deadline) {
     if ($devices.Count -eq 1) {
         $instanceId = [string]$devices[0].InstanceId
         $match = $transportPattern.Match($instanceId)
-        $pid = $match.Groups['pid'].Value.ToLowerInvariant()
-        $mode = if ($pid -eq '0003') { 'BootROM' } else { 'preloader' }
+        $transportPid = $match.Groups['pid'].Value.ToLowerInvariant()
+        $mode = if ($transportPid -eq '0003') { 'BootROM' } else { 'preloader' }
         $busId = [string]$devices[0].BusId
-        Write-Host "Detected MediaTek $mode 0e8d:$pid at BUSID $busId."
+        Write-Host "Detected MediaTek $mode 0e8d:$transportPid at BUSID $busId."
 
         if (-not $Execute) {
             if ($devices[0].PersistedGuid) {
@@ -127,10 +127,10 @@ while ([DateTime]::UtcNow -lt $deadline) {
                 Start-Sleep -Milliseconds $PollMilliseconds
                 continue
             }
-            Write-Host "Attached 0e8d:$pid to Docker Desktop."
+            Write-Host "Attached 0e8d:$transportPid to Docker Desktop."
         }
 
-        if ($pid -eq '0003') {
+        if ($transportPid -eq '0003') {
             Write-Host 'BootROM transport is ready for the waiting read-only capture.'
             Write-Output $busId
             exit 0
