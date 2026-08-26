@@ -73,6 +73,17 @@ reconnect:
 docker compose run --rm recovery-reader --execute
 ```
 
+Windows treats the short-lived `0e8d:0003` BootROM identity as a device distinct
+from Android. To catch and share it without racing Device Manager, start this
+helper from an elevated PowerShell before connecting the powered-off tablet:
+
+```powershell
+./scripts/wait-bind-rt7-brom.ps1 -Execute
+```
+
+It accepts exactly one connected `0e8d:0003` device, binds only its resolved
+BUSID, and exits. It never opens the device or sends it a USB command.
+
 The helper refuses a BUSID unless Windows reports a MediaTek/RT7 USB device. If
 the device has not been shared previously, it prints the one elevated `bind`
 command required by usbipd-win. Attaching and detaching are reversible host
