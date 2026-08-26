@@ -19,8 +19,8 @@ docker compose run --rm kernel-builder /project/scripts/apply-kernel-patches.sh
 docker compose run --rm kernel-builder /project/scripts/build-kernel.sh
 ```
 
-The build script fixes kernel build identity and timestamp inputs for
-reproducibility. `Image`, `Image.gz`, `System.map`, the resolved
+The build script fixes kernel build identity, timestamp, and debug-info output
+paths for reproducibility. `Image`, `Image.gz`, `System.map`, the resolved
 `kernel.config`, and `SHA256SUMS` are written under
 `../oukitel-rt7-linux-work/build/kernel/artifacts/`, never to the public tree.
 
@@ -41,3 +41,10 @@ RT7/MediaTek device. It is a dry run unless `-Execute` is provided.
 `build-rootfs.ps1` builds the pinned Debian ARM64 image, runs the privileged
 ext4/OverlayFS SSH and Docker smoke test, and exports the rootfs tar into the
 private work directory. It refuses to overwrite an existing artifact.
+
+`prepare-recovery-ramdisk.sh` injects the owner's ADB public key into the
+pinned stock recovery ramdisk and validates the personalized archive. The
+result stays private. `rt7-recovery-linux-start.sh` mounts a transferred ext4
+image and starts Debian manually; `start-recovery-linux.ps1` performs the
+guarded transfer through the existing `rt7-adb` Docker server, hash check, ADB
+port forward, and SSH/Docker health check.

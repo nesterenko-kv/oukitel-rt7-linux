@@ -40,6 +40,15 @@ export KBUILD_BUILD_TIMESTAMP="${KBUILD_BUILD_TIMESTAMP:-$(git -C "$kernel_dir" 
 # variable is not exported into recursive makes in a standalone checkout.
 export TARGET_PRODUCT='vnd_k6893v1_64_k419'
 
+# CONFIG_DEBUG_INFO records the out-of-tree build directory. LLD's fast build
+# ID hashes those non-loadable debug sections, which otherwise changes both
+# the VDSO and kernel build IDs when O= changes even though the loaded bytes are
+# identical. Map every disposable output path to one canonical path.
+canonical_build_path=${CANONICAL_BUILD_PATH:-/rt7-kernel-build}
+path_map_flag="-ffile-prefix-map=$output_dir=$canonical_build_path"
+export KCFLAGS="${KCFLAGS:+$KCFLAGS }$path_map_flag"
+export KAFLAGS="${KAFLAGS:+$KAFLAGS }$path_map_flag"
+
 mkdir -p "$output_dir" "$artifact_dir"
 cp "$source_config" "$output_dir/.config"
 

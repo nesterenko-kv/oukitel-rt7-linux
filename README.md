@@ -37,6 +37,8 @@ device support is moved to Linux incrementally.
 - Pinned MT6853 read-only recovery container and fixed capture plan
 - Reproducible Debian 12 ARM64 rootfs with key-only SSH and native Docker
 - Docker daemon and SSH startup validated in an ARM64 ext4 smoke test
+- Stock recovery toybox-to-Debian handoff validated through running Docker
+- Personalized nonpersistent recovery boot payload prepared offline
 - Known public-source omissions tracked explicitly in `docs/source-gaps.md`
 
 The first successful `Image` is 29,151,232 bytes and reproduced the same
@@ -45,7 +47,7 @@ validation, and the remaining blockers. It is a research artifact, not a
 flashable release.
 
 The keyless Debian rootfs tar also reproduced byte-for-byte across two builds:
-`8b6c5aea5d623f03eda1d45ccf14c3ccbe2a5e609afb5cb9ce9b1e9c76845483`.
+`db3b8f1b20ecba8502f2d8edf1a0b02e916b083432fc38d0bc674fc91e5fb01c`.
 An SSH key is injected only while creating the private ext4 image; see
 `rootfs/README.md` for the build and validation procedure.
 

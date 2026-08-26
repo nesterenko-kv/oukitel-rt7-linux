@@ -32,11 +32,16 @@ the package architecture and actually start ARM64 `sshd` and `dockerd` with
 Docker data on an ext4 loop filesystem. They do not prove that the tablet
 kernel and hardware work.
 
+`smoke-test-recovery-handoff.sh` additionally runs the stock recovery's ARM64
+toybox shell and validates the complete loop-mount/chroot handoff into a
+disposable Debian image. It still cannot emulate the MediaTek boot chain,
+SELinux transition, USB gadget, or tablet peripherals.
+
 The current keyless rootfs tar was reproduced byte-for-byte across two clean
 exports:
 
 ```text
-SHA256  8b6c5aea5d623f03eda1d45ccf14c3ccbe2a5e609afb5cb9ce9b1e9c76845483
+SHA256  db3b8f1b20ecba8502f2d8edf1a0b02e916b083432fc38d0bc674fc91e5fb01c
 Size    407961600 bytes
 ```
 

@@ -1,6 +1,9 @@
 #!/bin/sh
 set -eu
 
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export PATH
+
 if [ "$(id -u)" -ne 0 ]; then
     echo "rt7-chroot-start must run as root" >&2
     exit 1

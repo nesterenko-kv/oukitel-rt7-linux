@@ -3,8 +3,9 @@
 """Build an unsigned, non-flashable RT7 boot-image test artifact.
 
 The script first proves that pinned AOSP tools reproduce the signed stock
-image payload byte-for-byte. It then changes only the kernel component and
-verifies all other unpacked components and header arguments are unchanged.
+image payload byte-for-byte. It then substitutes the requested kernel and,
+optionally, a recovery ramdisk and command-line suffix. Every intended input
+is verified after repacking and all other components remain unchanged.
 """
 
 from __future__ import annotations
@@ -86,6 +87,18 @@ def replace_argument(arguments: list[str], name: str, value: Path) -> list[str]:
     return updated
 
 
+def append_cmdline(arguments: list[str], suffix: str) -> list[str]:
+    if not suffix or any(character in suffix for character in "\r\n\0"):
+        raise RuntimeError("invalid boot command-line suffix")
+    updated = arguments.copy()
+    try:
+        index = updated.index("--cmdline")
+    except ValueError as error:
+        raise RuntimeError("missing --cmdline in unpacked arguments") from error
+    updated[index + 1] = f"{updated[index + 1]} {suffix}".strip()
+    return updated
+
+
 def normalized_arguments(arguments: list[str]) -> list[str]:
     normalized = arguments.copy()
     for name in ("--kernel", "--ramdisk", "--second", "--dtb"):
@@ -122,6 +135,8 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--boot-img", required=True, type=Path)
     parser.add_argument("--expected-boot-sha256", required=True)
     parser.add_argument("--kernel", required=True, type=Path)
+    parser.add_argument("--ramdisk", type=Path)
+    parser.add_argument("--append-cmdline")
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument(
         "--tools-dir",
@@ -136,13 +151,17 @@ def main() -> int:
     python = sys.executable
     boot_image = options.boot_img.resolve()
     kernel = options.kernel.resolve()
+    ramdisk = options.ramdisk.resolve() if options.ramdisk else None
     output = options.output.resolve()
     tools_dir = options.tools_dir.resolve()
     unpack_tool = tools_dir / "mkbootimg" / "unpack_bootimg.py"
     mkbootimg_tool = tools_dir / "mkbootimg" / "mkbootimg.py"
     avbtool = tools_dir / "avb" / "avbtool.py"
 
-    for path in (boot_image, kernel, unpack_tool, mkbootimg_tool, avbtool):
+    required_paths = [boot_image, kernel, unpack_tool, mkbootimg_tool, avbtool]
+    if ramdisk:
+        required_paths.append(ramdisk)
+    for path in required_paths:
         if not path.is_file():
             raise RuntimeError(f"required input is not a file: {path}")
     if Path("/project") in output.parents:
@@ -178,28 +197,44 @@ def main() -> int:
 
         custom_temporary = temporary / "custom-unsigned-do-not-flash.img"
         custom_arguments = replace_argument(stock_arguments, "--kernel", kernel)
+        if ramdisk:
+            custom_arguments = replace_argument(custom_arguments, "--ramdisk", ramdisk)
+        if options.append_cmdline:
+            custom_arguments = append_cmdline(
+                custom_arguments, options.append_cmdline
+            )
         run([python, str(mkbootimg_tool), "--output", str(custom_temporary), *custom_arguments])
 
         unpacked_custom_arguments = unpack_args(
             python, unpack_tool, custom_temporary, custom_parts
         )
-        if normalized_arguments(stock_arguments) != normalized_arguments(
+        if normalized_arguments(custom_arguments) != normalized_arguments(
             unpacked_custom_arguments
         ):
             raise RuntimeError("custom image changed boot header arguments")
         if not files_equal(kernel, custom_parts / "kernel"):
             raise RuntimeError("custom image kernel did not round-trip")
-        for component in ("ramdisk", "dtb"):
-            if not files_equal(stock_parts / component, custom_parts / component):
-                raise RuntimeError(f"custom image changed stock {component}")
+        expected_ramdisk = ramdisk or stock_parts / "ramdisk"
+        if not files_equal(expected_ramdisk, custom_parts / "ramdisk"):
+            raise RuntimeError("custom image ramdisk did not round-trip")
+        if not files_equal(stock_parts / "dtb", custom_parts / "dtb"):
+            raise RuntimeError("custom image changed stock dtb")
         if custom_temporary.stat().st_size > payload_size:
             raise RuntimeError("custom boot payload exceeds the signed stock payload size")
+
+        selected_ramdisk = ramdisk or stock_parts / "ramdisk"
+        ramdisk_manifest = {
+            "filename": selected_ramdisk.name,
+            "sha256": sha256(selected_ramdisk),
+            "size": selected_ramdisk.stat().st_size,
+            "personalized": ramdisk is not None,
+        }
 
         custom_bytes = custom_temporary.read_bytes()
         write_idempotent(output, custom_bytes)
 
     manifest = {
-        "format": 1,
+        "format": 2,
         "warning": "UNSIGNED RESEARCH ARTIFACT - DO NOT FLASH",
         "source_boot": {
             "filename": boot_image.name,
@@ -212,6 +247,7 @@ def main() -> int:
             "sha256": sha256(kernel),
             "size": kernel.stat().st_size,
         },
+        "ramdisk": ramdisk_manifest,
         "output": {
             "filename": output.name,
             "sha256": sha256(output),
@@ -219,7 +255,7 @@ def main() -> int:
             "avb_signed": False,
             "flashable": False,
         },
-        "mkbootimg_arguments": normalized_arguments(stock_arguments),
+        "mkbootimg_arguments": normalized_arguments(custom_arguments),
         "avb_info": avb_info.rstrip().splitlines(),
     }
     manifest_path = output.with_suffix(output.suffix + ".json")
@@ -227,7 +263,7 @@ def main() -> int:
     write_idempotent(manifest_path, content)
 
     print("stock boot payload round-trip: PASS")
-    print("custom kernel-only substitution: PASS")
+    print("custom component substitution: PASS")
     print(f"output: {output}")
     print(f"sha256: {manifest['output']['sha256']}")
     print(f"size: {manifest['output']['size']} bytes")

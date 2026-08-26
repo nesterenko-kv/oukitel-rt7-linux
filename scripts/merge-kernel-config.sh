@@ -35,14 +35,22 @@ mkdir -p "$output_dir"
 gzip -dc "$stock_config_gz" > "$output_dir/stock.config"
 sed -n '/^CONFIG_OPLUS_/p' "$oppo_defconfig" > "$output_dir/oppo-source.config"
 
-"$kernel_dir/scripts/kconfig/merge_config.sh" \
-    -m \
-    -O "$output_dir" \
+set -- \
     "$output_dir/stock.config" \
     "$output_dir/oppo-source.config" \
     /project/configs/source-compat.config \
     /project/configs/docker-required.config \
     /project/configs/docker-recommended.config
+
+if [ -n "${EXTRA_CONFIG:-}" ]; then
+    if [ ! -r "$EXTRA_CONFIG" ]; then
+        printf 'error: extra kernel config not readable: %s\n' "$EXTRA_CONFIG" >&2
+        exit 1
+    fi
+    set -- "$@" "$EXTRA_CONFIG"
+fi
+
+"$kernel_dir/scripts/kconfig/merge_config.sh" -m -O "$output_dir" "$@"
 
 make -C "$kernel_dir" ARCH=arm64 O="$output_dir" olddefconfig
 

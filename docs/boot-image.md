@@ -20,14 +20,17 @@ This byte-for-byte comparison is a mandatory gate in
 `scripts/build-test-boot-image.py`. The script refuses to create a custom
 artifact if the stock payload cannot be reproduced exactly.
 
-## Kernel-only substitution
+## Component substitution
 
-The script then replaces only the compressed kernel with the reproducible
-local `Image.gz`. It unpacks the result again and verifies that:
+By default the script replaces only the compressed kernel with the
+reproducible local `Image.gz`. For the recovery handoff test it can also accept
+an explicitly prepared ramdisk and append a command-line suffix. It unpacks
+the result again and verifies that:
 
 - the custom kernel round-trips byte-for-byte;
-- the stock ramdisk and DTB remain byte-identical;
-- every boot header argument remains unchanged;
+- the selected ramdisk round-trips byte-for-byte;
+- the stock DTB remains byte-identical;
+- every header argument matches the requested input exactly;
 - the custom payload does not exceed the original payload size;
 - no output is written inside the public repository.
 
@@ -49,3 +52,7 @@ Before a boot attempt, the project still needs an exact rollback path, a
 verified unlock/recovery procedure, and a decision between nonpersistent
 `fastboot boot` and a controlled inactive-slot test. No AVB bypass or test-key
 signing will be added merely to make the image flashable.
+
+The personalized recovery experiment is described in
+`docs/recovery-linux.md`. Its boot payload is also unsigned and must not be
+flashed merely because the offline checks pass.
