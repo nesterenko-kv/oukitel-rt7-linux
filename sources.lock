@@ -71,6 +71,14 @@ size = 6348800
 sha256 = "91f6f695e1e13c656024e6d3b55620bf08d8835ef05ee0496935ba6bb62466a5"
 purpose = "Upstream mtkclient Windows fallback; not installed because usbipd-win is preferred"
 
+[[tool]]
+name = "android-platform-tools-linux"
+url = "https://dl.google.com/android/repository/platform-tools_r34.0.4-linux.zip"
+ref = "34.0.4-10411341"
+size = 6325905
+sha256 = "f2eee6e8220f3dfde6e1acc93c5b25d3d8bd215c0b03585b21665f1ea30d66ba"
+purpose = "Pinned containerized ADB and fastboot clients"
+
 [[firmware]]
 name = "official-android-13-reference"
 catalog_url = "https://oukitel.com/pages/download-center"

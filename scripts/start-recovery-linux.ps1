@@ -3,7 +3,7 @@ param(
     [string]$WorkDir,
     [string]$Serial,
     [string]$AdbContainer = 'rt7-adb',
-    [string]$AdbImage = 'local/rt7-adb:34.0.4',
+    [string]$AdbImage = 'local/oukitel-rt7-android-tools:34.0.4',
     [string]$ImageName = 'rt7-debian-bookworm-arm64-recovery-test-v2.ext4',
     [int]$SshPort = 22007,
     [switch]$SkipPush

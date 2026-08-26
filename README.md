@@ -35,6 +35,7 @@ device support is moved to Linux incrementally.
 - Kernel-only unsigned boot-image substitution validated offline
 - Official same-variant Android 13 recovery reference identified
 - Pinned MT6853 read-only recovery container with CRC-verified dual-pass capture
+- Pinned containerized Google ADB/fastboot with a read-only bootloader inspector
 - Reproducible Debian 12 ARM64 rootfs with key-only SSH and native Docker
 - Docker daemon and SSH startup validated in an ARM64 ext4 smoke test
 - Stock recovery toybox-to-Debian handoff validated through running Docker

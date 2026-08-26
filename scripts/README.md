@@ -4,6 +4,18 @@ Host-side scripts must default to read-only inspection. Any command capable of
 flashing, erasing, or unlocking a device must require an explicit target and a
 separate confirmation.
 
+The pinned ADB/fastboot container is started with:
+
+```sh
+docker compose build android-tools
+docker compose up -d android-tools
+```
+
+It keeps the controlling host key in the Compose-managed `adb-home` volume and
+mounts only Docker Desktop's USB bus. `inspect-rt7-fastboot.ps1` validates one
+RT7-family product and runs only a fixed list of `getvar` queries plus
+`flashing get_unlock_ability`; it has no boot, flash, erase, or unlock path.
+
 The kernel preparation and configuration scripts run inside the reproducible
 builder container from the repository root:
 
@@ -42,6 +54,7 @@ Its offline safety tests are:
 python -m unittest discover -s tests -v
 docker compose run --rm --entrypoint /opt/venv/bin/python recovery-reader \
     /project/tests/smoke_mtkclient_gpt_patch.py
+pwsh -File tests/inspect-rt7-fastboot.Tests.ps1
 ```
 
 `attach-rt7-usb.ps1` validates that a selected usbipd-win BUSID belongs to an

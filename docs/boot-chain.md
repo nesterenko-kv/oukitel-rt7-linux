@@ -40,6 +40,11 @@ strong evidence that a nonpersistent `fastboot boot` experiment exists in the
 reference LK. The exact installed December 2023 `lk_a` still has to be dumped
 and checked before relying on that path.
 
+Once the tablet is manually placed in fastboot and its USB device is attached
+to Docker Desktop, `scripts/inspect-rt7-fastboot.ps1` queries the exact product,
+slot, lock state, security state, maximum download size, and unlock ability.
+The inspection helper contains no boot or persistent-write operation.
+
 The extracted V1.4.8 kernel configuration has the same 5,870 symbols as the
 running stock configuration. Only two symbol values differ: the newer image
 adds two camera sensors and enables `CONFIG_ODM_BATTERY_ID_ADC`. This is strong
