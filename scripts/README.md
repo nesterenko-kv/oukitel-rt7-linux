@@ -52,6 +52,18 @@ USB device. It cannot select arbitrary partitions or accept arbitrary
 mtkclient commands. It verifies complete primary/backup GPT structures and two
 independent reads of every allowlisted artifact; see `docs/recovery.md`.
 
+`probe-mtk-handshake.py` is a narrower transport diagnostic for short-lived
+MediaTek USB handoffs. It enumerates only known BootROM/preloader identities,
+prints their interfaces/endpoints, and attempts only the four synchronization
+bytes that precede every MediaTek command. It has no flash, memory-write,
+download-agent, reboot, or arbitrary-command path. Run it instead of, never in
+parallel with, the full recovery reader:
+
+```sh
+docker compose run --rm --entrypoint /opt/venv/bin/python recovery-reader \
+    /project/scripts/probe-mtk-handshake.py --timeout 300
+```
+
 Its offline safety tests are:
 
 ```sh
