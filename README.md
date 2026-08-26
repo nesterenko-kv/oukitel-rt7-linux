@@ -34,6 +34,7 @@ device support is moved to Linux incrementally.
 - Stock boot payload reproduced byte-for-byte with pinned AOSP Android tools
 - Kernel-only unsigned boot-image substitution validated offline
 - Official same-variant Android 13 recovery reference identified
+- Pinned MT6853 read-only recovery container and fixed capture plan
 - Known public-source omissions tracked explicitly in `docs/source-gaps.md`
 
 The first successful `Image` is 29,151,232 bytes and reproduced the same

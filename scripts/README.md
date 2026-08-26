@@ -29,3 +29,11 @@ kernel: the pinned tools must reproduce the stock boot payload byte-for-byte,
 then the custom image must preserve the original ramdisk, DTB, and all header
 arguments. Its required output name includes `unsigned-do-not-flash`, and the
 script refuses to write build artifacts into the public repository.
+
+`capture-recovery-baseline.py` runs only in the `recovery-reader` container. It
+prints a fixed read-only plan by default and needs `--execute` before it opens a
+USB device. It cannot select arbitrary partitions or accept arbitrary
+mtkclient commands; see `docs/recovery.md`.
+
+`attach-rt7-usb.ps1` validates that a selected usbipd-win BUSID belongs to an
+RT7/MediaTek device. It is a dry run unless `-Execute` is provided.

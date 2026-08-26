@@ -47,6 +47,21 @@ tag_object = "ddfdf640772c0a2fbc9affb4cddba6cec5258c6d"
 commit = "8261ecd67956f6e9647ff5fd4aeb829f75fb3f66"
 purpose = "Inspect Android Verified Boot metadata without device writes"
 
+[[git]]
+name = "mtkclient"
+url = "https://github.com/bkerler/mtkclient.git"
+ref = "refs/tags/v2.1.4"
+commit = "4d29037104b1f378abedcace89ccd48e8a8aa314"
+purpose = "Read-only MediaTek GPT and boot-chain recovery capture"
+
+[[tool]]
+name = "usbdk-reference-only"
+url = "https://github.com/daynix/UsbDk/releases/download/v1.00-22/UsbDk_1.0.22_x64.msi"
+ref = "v1.00-22"
+size = 6348800
+sha256 = "91f6f695e1e13c656024e6d3b55620bf08d8835ef05ee0496935ba6bb62466a5"
+purpose = "Upstream mtkclient Windows fallback; not installed because usbipd-win is preferred"
+
 [[firmware]]
 name = "official-android-13-reference"
 catalog_url = "https://oukitel.com/pages/download-center"
@@ -69,3 +84,4 @@ official_v148_kernel_config_sha256 = "7a23f3bbb84466e681e1bbb4552c2e57329a7173ff
 official_v148_boot_payload_sha256 = "9808754e3b60e5e82a707c7c1e4eb056d992b8680e0aa82c0d591a15dfb13b26"
 official_v148_base_dtb_sha256 = "6aee33f20be015b37779551ae3af9e13554efd4ebd07cd133c76a3ce112ac716"
 official_v148_dtbo_entry_sha256 = "470f798d2eef0be5ce2ac71a1eccc6aaf1f51fb1093c55bbdab74dc64b3b11a3"
+official_v148_preloader_sha256 = "e76b3bc6f70f263026088c19665d25b900956832efcc448804be921cc765fa26"

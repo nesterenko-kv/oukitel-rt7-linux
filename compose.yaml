@@ -23,6 +23,32 @@ services:
         source: ${RT7_WORK_DIR:-../oukitel-rt7-linux-work}
         target: /rt7-work
 
+  recovery-reader:
+    build:
+      context: ./containers/mtkclient
+      args:
+        MTKCLIENT_COMMIT: 4d29037104b1f378abedcace89ccd48e8a8aa314
+    image: local/oukitel-rt7-mtkclient:2.1.4
+    # The tablet is attached to docker-desktop with usbipd-win. Raw USB access
+    # is needed by libusb, while the runtime network is deliberately disabled.
+    privileged: true
+    network_mode: none
+    working_dir: /rt7-work/recovery
+    entrypoint:
+      - /opt/venv/bin/python
+      - /project/scripts/capture-recovery-baseline.py
+    volumes:
+      - type: bind
+        source: /dev/bus/usb
+        target: /dev/bus/usb
+      - type: bind
+        source: .
+        target: /project
+        read_only: true
+      - type: bind
+        source: ${RT7_WORK_DIR:-../oukitel-rt7-linux-work}
+        target: /rt7-work
+
 volumes:
   kernel-source:
   kernel-modules-source:
