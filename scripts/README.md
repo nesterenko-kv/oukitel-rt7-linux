@@ -14,6 +14,7 @@ docker compose run --rm kernel-builder /project/scripts/merge-kernel-config.sh
 docker compose run --rm kernel-builder /project/scripts/fetch-moby-check-config.sh
 docker compose run --rm kernel-builder /project/scripts/audit-kernel-config.sh
 docker compose run --rm kernel-builder /project/scripts/prepare-toolchain.sh
+docker compose run --rm kernel-builder /project/scripts/prepare-android-boot-tools.sh
 docker compose run --rm kernel-builder /project/scripts/apply-kernel-patches.sh
 docker compose run --rm kernel-builder /project/scripts/build-kernel.sh
 ```
@@ -22,3 +23,9 @@ The build script fixes kernel build identity and timestamp inputs for
 reproducibility. `Image`, `Image.gz`, `System.map`, the resolved
 `kernel.config`, and `SHA256SUMS` are written under
 `../oukitel-rt7-linux-work/build/kernel/artifacts/`, never to the public tree.
+
+`build-test-boot-image.py` performs an offline safety gate before replacing a
+kernel: the pinned tools must reproduce the stock boot payload byte-for-byte,
+then the custom image must preserve the original ramdisk, DTB, and all header
+arguments. Its required output name includes `unsigned-do-not-flash`, and the
+script refuses to write build artifacts into the public repository.

@@ -31,6 +31,22 @@ size = 342332098
 sha256 = "b405185894767ab9eaa23febc7ad549aa970ad3997ff7182f46d545e19c26a86"
 purpose = "Exact clang family recorded in the official RT7 kernel build"
 
+[[git]]
+name = "aosp-mkbootimg"
+url = "https://android.googlesource.com/platform/system/tools/mkbootimg"
+ref = "refs/tags/android-13.0.0_r1"
+tag_object = "8f595f25949e15e5d5797a1d0f3bc3f325ccd8b3"
+commit = "6cb944b82c819b691bc21d8228e155f1db07a446"
+purpose = "Unpack and repack Android boot header v2 images"
+
+[[git]]
+name = "aosp-avb"
+url = "https://android.googlesource.com/platform/external/avb"
+ref = "refs/tags/android-13.0.0_r1"
+tag_object = "ddfdf640772c0a2fbc9affb4cddba6cec5258c6d"
+commit = "8261ecd67956f6e9647ff5fd4aeb829f75fb3f66"
+purpose = "Inspect Android Verified Boot metadata without device writes"
+
 [[firmware]]
 name = "official-android-13-reference"
 catalog_url = "https://oukitel.com/pages/download-center"
@@ -50,3 +66,6 @@ expected_installed_firmware = "TP758_OQ_P07_NFC_6853_T0_EEA_V1.2.9_S231205.zip"
 official_v148_boot_sha256 = "6dab05265bb57a68ceb244e12ea1b5fa69e660b5fb3bfc9b774c74e83a10b998"
 official_v148_dtbo_sha256 = "43f197fc78d8d5f5cd5894a374e32ab4807bcdf6d1a1b385a20a3fee7f829ede"
 official_v148_kernel_config_sha256 = "7a23f3bbb84466e681e1bbb4552c2e57329a7173ff43cd8d0bcb823bd82c3a38"
+official_v148_boot_payload_sha256 = "9808754e3b60e5e82a707c7c1e4eb056d992b8680e0aa82c0d591a15dfb13b26"
+official_v148_base_dtb_sha256 = "6aee33f20be015b37779551ae3af9e13554efd4ebd07cd133c76a3ce112ac716"
+official_v148_dtbo_entry_sha256 = "470f798d2eef0be5ce2ac71a1eccc6aaf1f51fb1093c55bbdab74dc64b3b11a3"

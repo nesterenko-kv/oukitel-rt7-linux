@@ -31,6 +31,8 @@ device support is moved to Linux incrementally.
 - Merged configuration passes every generally necessary Moby Docker check
 - Exact official Android clang-r383902 toolchain pinned and verified
 - Reproducible ARM64 Linux 4.19.191 compile baseline built successfully
+- Stock boot payload reproduced byte-for-byte with pinned AOSP Android tools
+- Kernel-only unsigned boot-image substitution validated offline
 - Official same-variant Android 13 recovery reference identified
 - Known public-source omissions tracked explicitly in `docs/source-gaps.md`
 

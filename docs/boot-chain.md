@@ -50,5 +50,8 @@ Before any experiment, the project must have:
 4. a reproducible kernel build and boot-image repack test;
 5. a way to restore the original active slot from a host.
 
+The reproducible kernel build and byte-identical stock payload round trip are
+now complete. The exact rollback and host-restoration requirements are not.
+
 Never flash `preloader`, `nvram`, `nvdata`, `persist`, `protect1`, or
 `protect2` as part of Linux bring-up.
