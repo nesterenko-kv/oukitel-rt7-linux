@@ -61,32 +61,6 @@ Write-Host "Waiting up to $TimeoutSeconds seconds for RT7 preloader/BROM 0e8d:20
 while ([DateTime]::UtcNow -lt $deadline) {
     $state = (& $usbipd.Source state | ConvertFrom-Json)
 
-    if ($Execute) {
-        foreach ($pid in $targetPids) {
-            $hardwareId = "0e8d:$pid"
-            $pattern = [regex]::new(
-                "^USB\\VID_0E8D&PID_${pid}\\",
-                [Text.RegularExpressions.RegexOptions]::IgnoreCase
-            )
-            $readyBinding = @($state.Devices | Where-Object {
-                $pattern.IsMatch([string]$_.InstanceId) -and
-                $_.PersistedGuid -and
-                (-not $Force -or $_.IsForced)
-            })
-            if ($readyBinding.Count -eq 0) {
-                $bindArguments = @('bind')
-                if ($Force) {
-                    $bindArguments += '--force'
-                }
-                $bindArguments += @('--hardware-id', $hardwareId)
-                & $usbipd.Source @bindArguments 2>$null
-                # A missing short-lived mode is expected. A successful bind is
-                # observed from the refreshed authoritative state below.
-            }
-        }
-        $state = (& $usbipd.Source state | ConvertFrom-Json)
-    }
-
     $devices = @($state.Devices | Where-Object {
         $transportPattern.IsMatch([string]$_.InstanceId) -and $_.BusId
     })
@@ -115,9 +89,33 @@ while ([DateTime]::UtcNow -lt $deadline) {
         $bindingReady = $devices[0].PersistedGuid -and
             (-not $Force -or $devices[0].IsForced)
         if (-not $bindingReady) {
-            Write-Host 'The short-lived USB identity is not bound yet; continuing the fast bind loop.'
-            Start-Sleep -Milliseconds $PollMilliseconds
-            continue
+            # usbipd-win 5.3 can report success for `bind --force
+            # --hardware-id` while persisting IsForced=false. Bind the exact,
+            # already validated connected BUSID so --force is authoritative.
+            $bindArguments = @('bind')
+            if ($Force) {
+                $bindArguments += '--force'
+            }
+            $bindArguments += @('--busid', $busId)
+            & $usbipd.Source @bindArguments 2>$null
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host 'The short-lived USB identity vanished during bind; continuing to wait.'
+                Start-Sleep -Milliseconds $PollMilliseconds
+                continue
+            }
+
+            $state = (& $usbipd.Source state | ConvertFrom-Json)
+            $boundDevice = @($state.Devices | Where-Object {
+                [string]$_.InstanceId -eq $instanceId -and
+                $_.PersistedGuid -and
+                (-not $Force -or $_.IsForced)
+            })
+            if ($boundDevice.Count -ne 1) {
+                Write-Host 'usbipd did not persist the requested binding; continuing to wait.'
+                Start-Sleep -Milliseconds $PollMilliseconds
+                continue
+            }
+            $devices[0] = $boundDevice[0]
         }
 
         if (-not $devices[0].ClientIPAddress) {

@@ -87,6 +87,12 @@ its resolved BUSID, attaches it to Docker Desktop, follows a preloader-to-BROM
 reconnect, and exits after BootROM is attached. It never opens the device or
 sends it a USB command itself.
 
+The helper deliberately resolves the connected USB identity first and invokes
+`usbipd bind --force --busid <BUSID>`. Do not replace that operation with
+`--force --hardware-id`: usbipd-win 5.3 may return success for the latter while
+persisting `IsForced=false`, which lets the Windows serial driver win the next
+sub-second preloader handoff.
+
 `-Force` is explicit because it temporarily prevents Windows from claiming the
 two short-lived serial interfaces. This is needed when the host COM driver wins
 the sub-second race; it affects only the host binding and is reversible with

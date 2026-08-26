@@ -69,7 +69,10 @@ RT7/MediaTek device. It is a dry run unless `-Execute` is provided.
 identities (`0e8d:2000` and `0e8d:0003`) and, only when run elevated with
 `-Execute`, shares and attaches those exact BUSIDs. Its explicit `-Force` mode
 prevents the Windows COM driver from winning the short preloader handoff and is
-reversible with `usbipd unbind`.
+reversible with `usbipd unbind`. Forced binding is performed only after an exact
+MediaTek boot identity has been resolved to a connected BUSID; hardware-ID force
+binding is intentionally avoided because usbipd-win 5.3 may persist it without
+the requested forced flag.
 
 `build-rootfs.ps1` builds the pinned Debian ARM64 image, runs the privileged
 ext4/OverlayFS SSH and Docker smoke test, and exports the rootfs tar into the
