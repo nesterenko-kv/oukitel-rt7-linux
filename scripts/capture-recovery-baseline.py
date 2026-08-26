@@ -141,21 +141,32 @@ def validate_read_only_plan(plan: list[str], output: Path) -> None:
         raise SystemExit("Internal safety error: recovery plan is not the fixed allowlist")
 
 
-def build_mtk_command(mtk_root: Path, preloader: Path, plan_file: Path) -> list[str]:
+def build_mtk_command(
+    mtk_root: Path,
+    preloader: Path,
+    plan_file: Path,
+    *,
+    debug_usb: bool = False,
+) -> list[str]:
     # Limit discovery to mtkclient's known MediaTek boot transports. This keeps
     # both the short-lived preloader (normally PID 0x2000) and BootROM (0x0003)
     # reachable across a volatile crash/reconnect while excluding the RT7's
     # Android META composite PID 0x200e and every non-MediaTek USB vendor.
-    return [
+    command = [
         sys.executable,
         str(mtk_root / "mtk.py"),
+    ]
+    if debug_usb:
+        command.append("--debugmode")
+    command.extend([
         "--vid",
         MTK_BOOT_VID,
         "--preloader",
         str(preloader),
         "script",
         str(plan_file),
-    ]
+    ])
+    return command
 
 
 def parse_gpt_header(data: bytes, offset: int, label: str) -> dict[str, object]:
@@ -483,6 +494,11 @@ def main() -> int:
         action="store_true",
         help="connect to the tablet and execute the read-only plan",
     )
+    parser.add_argument(
+        "--debug-usb",
+        action="store_true",
+        help="enable mtkclient USB handshake diagnostics in the private output",
+    )
     args = parser.parse_args()
 
     mtk_root = safe_path(args.mtk_root, "mtkclient root")
@@ -514,7 +530,12 @@ def main() -> int:
     plan_file = output / "read-only-plan.txt"
     plan_file.write_text("\n".join(plan) + "\n", encoding="ascii", newline="\n")
 
-    command = build_mtk_command(mtk_root, preloader, plan_file)
+    command = build_mtk_command(
+        mtk_root,
+        preloader,
+        plan_file,
+        debug_usb=args.debug_usb,
+    )
     result = subprocess.run(command, cwd=output, check=False)
     if result.returncode != 0:
         raise SystemExit(f"mtkclient exited with status {result.returncode}")

@@ -208,6 +208,25 @@ class ReadOnlyPlanTests(unittest.TestCase):
         self.assertNotIn("--pid", command)
         self.assertNotIn("0x200e", [argument.lower() for argument in command])
 
+    def test_usb_debug_mode_is_explicit(self) -> None:
+        normal = capture.build_mtk_command(
+            Path("/opt/mtkclient"),
+            Path("/private/reference-preloader.bin"),
+            Path("/private/read-only-plan.txt"),
+        )
+        debug = capture.build_mtk_command(
+            Path("/opt/mtkclient"),
+            Path("/private/reference-preloader.bin"),
+            Path("/private/read-only-plan.txt"),
+            debug_usb=True,
+        )
+        self.assertNotIn("--debugmode", normal)
+        self.assertIn("--debugmode", debug)
+        self.assertEqual(
+            [argument for argument in debug if argument != "--debugmode"],
+            normal,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -73,6 +73,17 @@ reconnect:
 docker compose run --rm recovery-reader --execute
 ```
 
+If the USB identity is attached but the MediaTek four-byte handshake still
+fails, rerun the reader with private verbose diagnostics:
+
+```powershell
+docker compose run --rm recovery-reader --execute --debug-usb
+```
+
+This changes logging only; it executes the same validated read-only command
+plan. Debug logs and captured firmware remain below the private `/rt7-work`
+mount and must not be committed.
+
 Windows treats the short-lived `0e8d:2000` preloader and `0e8d:0003` BootROM
 identities as devices distinct from Android. To catch, share, and attach both
 transports without racing Device Manager, start this helper from an elevated
