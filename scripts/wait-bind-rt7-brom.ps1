@@ -35,7 +35,7 @@ if ($Force -and -not $Execute) {
 }
 
 if ($Execute -and $Force) {
-    $initialState = (& $usbipd.Source state | ConvertFrom-Json)
+    $initialState = (& $usbipd state | ConvertFrom-Json)
     foreach ($targetPid in $targetPids) {
         $hardwareId = "0e8d:$targetPid"
         $pattern = [regex]::new(
@@ -49,7 +49,7 @@ if ($Execute -and $Force) {
         })
         if ($nonForced.Count -gt 0) {
             Assert-Administrator
-            & $usbipd.Source unbind --hardware-id $hardwareId
+            & $usbipd unbind --hardware-id $hardwareId
             if ($LASTEXITCODE -ne 0) {
                 throw "Unable to remove the existing non-forced $hardwareId binding."
             }
@@ -60,7 +60,7 @@ if ($Execute -and $Force) {
 
 Write-Host "Waiting up to $TimeoutSeconds seconds for RT7 preloader/BROM 0e8d:2000 or 0e8d:0003..."
 while ([DateTime]::UtcNow -lt $deadline) {
-    $state = (& $usbipd.Source state | ConvertFrom-Json)
+    $state = (& $usbipd state | ConvertFrom-Json)
 
     $devices = @($state.Devices | Where-Object {
         $transportPattern.IsMatch([string]$_.InstanceId) -and $_.BusId
@@ -84,7 +84,7 @@ while ([DateTime]::UtcNow -lt $deadline) {
                 Write-Host "Dry run only. In elevated PowerShell run: usbipd bind --busid $busId"
             }
             Write-Output $busId
-            exit 0
+            return
         }
 
         $bindingReady = $devices[0].PersistedGuid -and
@@ -99,14 +99,14 @@ while ([DateTime]::UtcNow -lt $deadline) {
                 $bindArguments += '--force'
             }
             $bindArguments += @('--busid', $busId)
-            & $usbipd.Source @bindArguments 2>$null
+            & $usbipd @bindArguments 2>$null
             if ($LASTEXITCODE -ne 0) {
                 Write-Host 'The short-lived USB identity vanished during bind; continuing to wait.'
                 Start-Sleep -Milliseconds $PollMilliseconds
                 continue
             }
 
-            $state = (& $usbipd.Source state | ConvertFrom-Json)
+            $state = (& $usbipd state | ConvertFrom-Json)
             $boundDevice = @($state.Devices | Where-Object {
                 [string]$_.InstanceId -eq $instanceId -and
                 $_.PersistedGuid -and
@@ -121,7 +121,7 @@ while ([DateTime]::UtcNow -lt $deadline) {
         }
 
         if (-not $devices[0].ClientIPAddress) {
-            & $usbipd.Source attach --wsl docker-desktop --busid $busId
+            & $usbipd attach --wsl docker-desktop --busid $busId
             if ($LASTEXITCODE -ne 0) {
                 Write-Host 'The short-lived USB identity vanished during attach; continuing to wait.'
                 Start-Sleep -Milliseconds $PollMilliseconds
@@ -133,7 +133,7 @@ while ([DateTime]::UtcNow -lt $deadline) {
         if ($transportPid -eq '0003') {
             Write-Host 'BootROM transport is ready for the waiting read-only capture.'
             Write-Output $busId
-            exit 0
+            return
         }
 
         Write-Host 'Preloader is attached; waiting for its volatile transition to BootROM.'
