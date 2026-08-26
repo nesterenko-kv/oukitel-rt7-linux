@@ -22,11 +22,11 @@ $transportPattern = [regex]::new(
     [Text.RegularExpressions.RegexOptions]::IgnoreCase
 )
 
-if ($Execute) {
+function Assert-Administrator {
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal = [Security.Principal.WindowsPrincipal]::new($identity)
     if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        throw '-Execute requires an elevated PowerShell process.'
+        throw 'Changing the Windows USB binding requires an elevated PowerShell process.'
     }
 }
 
@@ -48,6 +48,7 @@ if ($Execute -and $Force) {
             -not $_.IsForced
         })
         if ($nonForced.Count -gt 0) {
+            Assert-Administrator
             & $usbipd.Source unbind --hardware-id $hardwareId
             if ($LASTEXITCODE -ne 0) {
                 throw "Unable to remove the existing non-forced $hardwareId binding."
@@ -92,6 +93,7 @@ while ([DateTime]::UtcNow -lt $deadline) {
             # usbipd-win 5.3 can report success for `bind --force
             # --hardware-id` while persisting IsForced=false. Bind the exact,
             # already validated connected BUSID so --force is authoritative.
+            Assert-Administrator
             $bindArguments = @('bind')
             if ($Force) {
                 $bindArguments += '--force'

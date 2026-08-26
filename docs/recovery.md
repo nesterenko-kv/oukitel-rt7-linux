@@ -110,6 +110,11 @@ multi-second `--auto-attach` retry observes it. Keep the helper running until it
 reports that BootROM has been attached; do not run a second auto-attach loop for
 the same BUSID in parallel.
 
+Elevation is required only when the helper actually changes a usbipd binding.
+After both boot identities have already been persisted with `IsForced=true`,
+the same command may be rerun from a normal PowerShell to perform the fast,
+reversible attach without another UAC prompt.
+
 `-Force` is explicit because it temporarily prevents Windows from claiming the
 two short-lived serial interfaces. This is needed when the host COM driver wins
 the sub-second race; it affects only the host binding and is reversible with

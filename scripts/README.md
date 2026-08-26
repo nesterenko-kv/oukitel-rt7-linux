@@ -72,7 +72,9 @@ prevents the Windows COM driver from winning the short preloader handoff and is
 reversible with `usbipd unbind`. Forced binding is performed only after an exact
 MediaTek boot identity has been resolved to a connected BUSID; hardware-ID force
 binding is intentionally avoided because usbipd-win 5.3 may persist it without
-the requested forced flag.
+the requested forced flag. Elevation is checked only when a binding must be
+created or replaced; an already forced identity can be attached from a normal
+PowerShell process.
 
 `build-rootfs.ps1` builds the pinned Debian ARM64 image, runs the privileged
 ext4/OverlayFS SSH and Docker smoke test, and exports the rootfs tar into the
