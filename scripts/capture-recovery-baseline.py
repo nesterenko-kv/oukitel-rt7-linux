@@ -15,6 +15,7 @@ import zlib
 
 MTKCLIENT_COMMIT = "4d29037104b1f378abedcace89ccd48e8a8aa314"
 MTKCLIENT_GPT_PATCH_MARKER = "RT7_CAPTURE_GPT_V1"
+MTKCLIENT_USB_PATCH_MARKER = "RT7_CAPTURE_USB_FILTER_V1"
 BROM_VID = "0x0E8D"
 BROM_PID = "0x0003"
 PRELOADER_SHA256 = "e76b3bc6f70f263026088c19665d25b900956832efcc448804be921cc765fa26"
@@ -83,6 +84,10 @@ def validate_tool(mtk_root: Path) -> None:
     handler = mtk_root / "mtkclient/Library/DA/mtk_da_handler.py"
     if handler.read_text(encoding="utf-8").count(MTKCLIENT_GPT_PATCH_MARKER) != 1:
         raise SystemExit("Pinned mtkclient is missing the verified GPT capture patch")
+
+    mtk_class = mtk_root / "mtkclient/Library/mtk_class.py"
+    if mtk_class.read_text(encoding="utf-8").count(MTKCLIENT_USB_PATCH_MARKER) != 1:
+        raise SystemExit("Pinned mtkclient is missing the verified USB filter patch")
 
 
 def build_plan(output: Path) -> list[str]:

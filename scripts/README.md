@@ -58,6 +58,8 @@ Its offline safety tests are:
 python -m unittest discover -s tests -v
 docker compose run --rm --entrypoint /opt/venv/bin/python recovery-reader \
     /project/tests/smoke_mtkclient_gpt_patch.py
+docker compose run --rm --entrypoint /opt/venv/bin/python recovery-reader \
+    /project/tests/smoke_mtkclient_usb_filter.py
 pwsh -File tests/inspect-rt7-fastboot.Tests.ps1
 ```
 

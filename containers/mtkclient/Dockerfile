@@ -20,14 +20,20 @@ RUN git init /opt/mtkclient \
     && test "$(git -C /opt/mtkclient rev-parse HEAD)" = "${MTKCLIENT_COMMIT}"
 
 COPY mtkclient-gpt-capture.patch /tmp/mtkclient-gpt-capture.patch
+COPY mtkclient-usb-filter.patch /tmp/mtkclient-usb-filter.patch
 
 RUN git -C /opt/mtkclient apply --check /tmp/mtkclient-gpt-capture.patch \
     && git -C /opt/mtkclient apply /tmp/mtkclient-gpt-capture.patch \
+    && git -C /opt/mtkclient apply --check /tmp/mtkclient-usb-filter.patch \
+    && git -C /opt/mtkclient apply /tmp/mtkclient-usb-filter.patch \
     && git -C /opt/mtkclient diff --check \
     && grep -q RT7_CAPTURE_GPT_V1 \
         /opt/mtkclient/mtkclient/Library/DA/mtk_da_handler.py \
+    && grep -q RT7_CAPTURE_USB_FILTER_V1 \
+        /opt/mtkclient/mtkclient/Library/mtk_class.py \
     && python3 -m py_compile \
-        /opt/mtkclient/mtkclient/Library/DA/mtk_da_handler.py
+        /opt/mtkclient/mtkclient/Library/DA/mtk_da_handler.py \
+        /opt/mtkclient/mtkclient/Library/mtk_class.py
 
 COPY requirements.txt /tmp/mtkclient-requirements.txt
 
