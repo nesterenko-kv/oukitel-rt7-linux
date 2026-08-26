@@ -65,8 +65,9 @@ pwsh -File tests/inspect-rt7-fastboot.Tests.ps1
 
 `attach-rt7-usb.ps1` validates that a selected usbipd-win BUSID belongs to an
 RT7/MediaTek device. It is a dry run unless `-Execute` is provided.
-`wait-bind-rt7-brom.ps1` polls for the short-lived MediaTek `0e8d:0003`
-identity and, only when run elevated with `-Execute`, shares that exact BUSID.
+`wait-bind-rt7-brom.ps1` polls for the short-lived MediaTek preloader/BROM
+identities (`0e8d:2000` and `0e8d:0003`) and, only when run elevated with
+`-Execute`, shares and attaches those exact BUSIDs.
 
 `build-rootfs.ps1` builds the pinned Debian ARM64 image, runs the privileged
 ext4/OverlayFS SSH and Docker smoke test, and exports the rootfs tar into the

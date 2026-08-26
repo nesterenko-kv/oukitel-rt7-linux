@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify that mtkclient's exact VID/PID mode builds a strict USB mapping."""
+"""Verify that mtkclient builds strict exact and vendor-only USB mappings."""
 
 import logging
 import sys
@@ -17,7 +17,16 @@ def main() -> None:
     device = Mtk(config=config)
     assert device.port.cdc.portconfig == {0x0E8D: {0x0003: -1}}
     assert 0x200E not in device.port.cdc.portconfig[0x0E8D]
-    print("Patched mtkclient exact BootROM USB filter: PASS")
+
+    config = MtkConfig(loglevel=logging.CRITICAL)
+    config.vid = 0x0E8D
+    vendor_device = Mtk(config=config)
+    mapping = vendor_device.port.cdc.portconfig
+    assert set(mapping) == {0x0E8D}
+    assert 0x0003 in mapping[0x0E8D]
+    assert 0x2000 in mapping[0x0E8D]
+    assert 0x200E not in mapping[0x0E8D]
+    print("Patched mtkclient MediaTek boot USB filters: PASS")
 
 
 if __name__ == "__main__":

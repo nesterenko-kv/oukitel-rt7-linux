@@ -195,16 +195,17 @@ class ReadOnlyPlanTests(unittest.TestCase):
         with self.assertRaisesRegex(SystemExit, "fixed allowlist"):
             capture.validate_read_only_plan(plan, output)
 
-    def test_transport_accepts_only_real_mediatek_brom(self) -> None:
+    def test_transport_accepts_only_mediatek_boot_vendor(self) -> None:
         command = capture.build_mtk_command(
             Path("/opt/mtkclient"),
             Path("/private/reference-preloader.bin"),
             Path("/private/read-only-plan.txt"),
         )
         self.assertEqual(
-            command[2:6],
-            ["--vid", "0x0E8D", "--pid", "0x0003"],
+            command[2:4],
+            ["--vid", "0x0E8D"],
         )
+        self.assertNotIn("--pid", command)
         self.assertNotIn("0x200e", [argument.lower() for argument in command])
 
 

@@ -16,8 +16,7 @@ import zlib
 MTKCLIENT_COMMIT = "4d29037104b1f378abedcace89ccd48e8a8aa314"
 MTKCLIENT_GPT_PATCH_MARKER = "RT7_CAPTURE_GPT_V1"
 MTKCLIENT_USB_PATCH_MARKER = "RT7_CAPTURE_USB_FILTER_V1"
-BROM_VID = "0x0E8D"
-BROM_PID = "0x0003"
+MTK_BOOT_VID = "0x0E8D"
 PRELOADER_SHA256 = "e76b3bc6f70f263026088c19665d25b900956832efcc448804be921cc765fa26"
 DEFAULT_PRELOADER = (
     "/rt7-work/firmware/extracted/V1.4.8/"
@@ -143,17 +142,15 @@ def validate_read_only_plan(plan: list[str], output: Path) -> None:
 
 
 def build_mtk_command(mtk_root: Path, preloader: Path, plan_file: Path) -> list[str]:
-    # MediaTek's Android META composite interface also uses vendor 0x0e8d
-    # (observed as PID 0x200e on the RT7). Without an exact filter mtkclient
-    # mistakes its ADB bulk endpoints for a preloader and repeatedly attempts a
-    # handshake. Recovery capture accepts only the real BootROM USB identity.
+    # Limit discovery to mtkclient's known MediaTek boot transports. This keeps
+    # both the short-lived preloader (normally PID 0x2000) and BootROM (0x0003)
+    # reachable across a volatile crash/reconnect while excluding the RT7's
+    # Android META composite PID 0x200e and every non-MediaTek USB vendor.
     return [
         sys.executable,
         str(mtk_root / "mtk.py"),
         "--vid",
-        BROM_VID,
-        "--pid",
-        BROM_PID,
+        MTK_BOOT_VID,
         "--preloader",
         str(preloader),
         "script",

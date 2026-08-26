@@ -73,16 +73,19 @@ reconnect:
 docker compose run --rm recovery-reader --execute
 ```
 
-Windows treats the short-lived `0e8d:0003` BootROM identity as a device distinct
-from Android. To catch and share it without racing Device Manager, start this
-helper from an elevated PowerShell before connecting the powered-off tablet:
+Windows treats the short-lived `0e8d:2000` preloader and `0e8d:0003` BootROM
+identities as devices distinct from Android. To catch, share, and attach both
+transports without racing Device Manager, start this helper from an elevated
+PowerShell before connecting the powered-off tablet:
 
 ```powershell
 ./scripts/wait-bind-rt7-brom.ps1 -Execute
 ```
 
-It accepts exactly one connected `0e8d:0003` device, binds only its resolved
-BUSID, and exits. It never opens the device or sends it a USB command.
+It accepts exactly one connected `0e8d:2000` or `0e8d:0003` device, binds only
+its resolved BUSID, attaches it to Docker Desktop, follows a preloader-to-BROM
+reconnect, and exits after BootROM is attached. It never opens the device or
+sends it a USB command itself.
 
 The helper refuses a BUSID unless Windows reports a MediaTek/RT7 USB device. If
 the device has not been shared previously, it prints the one elevated `bind`
@@ -97,10 +100,10 @@ The DA and exploit path executes volatile code in tablet RAM and may reset the
 device; "read-only" here specifically means that the fixed command allowlist
 contains no persistent-storage write, erase, unlock, or patch operation.
 
-The wrapper also fixes the USB transport to the real MediaTek BootROM identity
-`0e8d:0003`. The RT7 can expose an Android META composite interface as
-`0e8d:200e`; that interface contains ADB and CDC endpoints and is deliberately
-rejected instead of being mistaken for a preloader.
+The wrapper fixes USB discovery to MediaTek's vendor and mtkclient's known boot
+transport PIDs. This lets it follow the RT7 from the short-lived preloader
+(`0e8d:2000`) into BootROM (`0e8d:0003`) while excluding Android's META
+composite interface (`0e8d:200e`) and all non-MediaTek USB vendors.
 
 Successful completion produces `pass1/`, `pass2/`, `SHA256SUMS.txt`, and a
 parsed `capture-manifest.json` under the private output directory. Save the
