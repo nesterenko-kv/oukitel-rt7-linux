@@ -1,0 +1,45 @@
+name: Safety tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: safety-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  guarded-recovery:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Compile Python sources
+        shell: pwsh
+        run: python -m compileall -q scripts tests
+
+      - name: Test recovery capture and manifests
+        shell: pwsh
+        run: python -m unittest discover -s tests -v
+
+      - name: Test guarded fastboot inspection
+        shell: pwsh
+        run: pwsh -NoProfile -File tests/inspect-rt7-fastboot.Tests.ps1
+
+      - name: Test MediaTek BootROM attach helper
+        shell: pwsh
+        run: pwsh -NoProfile -File tests/wait-bind-rt7-brom.Tests.ps1
+
+      - name: Test independent rollback copy
+        shell: pwsh
+        run: pwsh -NoProfile -File tests/copy-verified-recovery.Tests.ps1
