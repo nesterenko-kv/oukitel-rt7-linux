@@ -8,6 +8,8 @@ services:
     container_name: rt7-adb
     init: true
     restart: unless-stopped
+    device_cgroup_rules:
+      - "c 189:* rmw"
     volumes:
       - type: bind
         source: /dev/bus/usb

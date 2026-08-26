@@ -12,7 +12,11 @@ docker compose up -d android-tools
 ```
 
 It keeps the controlling host key in the Compose-managed `adb-home` volume and
-mounts only Docker Desktop's USB bus. `inspect-rt7-fastboot.ps1` validates one
+mounts only Docker Desktop's USB bus, with a cgroup rule limited to USB character
+devices (major 189). The default clients are Ubuntu's pinned
+34.0.4 usbfs build because the checksum-pinned Google libusb binaries return
+`EIO` for the RT7 interface forwarded by usbipd-win; both variants remain in
+the image for diagnosis. `inspect-rt7-fastboot.ps1` validates one
 RT7-family product and runs only a fixed list of `getvar` queries plus
 `flashing get_unlock_ability`; it has no boot, flash, erase, or unlock path.
 

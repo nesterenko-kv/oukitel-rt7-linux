@@ -77,7 +77,7 @@ url = "https://dl.google.com/android/repository/platform-tools_r34.0.4-linux.zip
 ref = "34.0.4-10411341"
 size = 6325905
 sha256 = "f2eee6e8220f3dfde6e1acc93c5b25d3d8bd215c0b03585b21665f1ea30d66ba"
-purpose = "Pinned containerized ADB and fastboot clients"
+purpose = "Checksum-pinned Google ADB/fastboot reference clients; Ubuntu 34.0.4 usbfs clients are the container defaults"
 
 [[firmware]]
 name = "official-android-13-reference"
